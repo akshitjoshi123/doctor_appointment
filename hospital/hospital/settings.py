@@ -14,10 +14,17 @@ from pathlib import Path
 
 import os
 
-from environ import Env
+from dotenv import load_dotenv
 
-env = Env()
-env.read_env()
+# from environ import Env
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ENV_FILE = ".env"
+
+load_dotenv(os.path.join(BASE_DIR, ENV_FILE))
+
+# env = Env()
+# env.read_env()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -44,7 +51,27 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
+    'rest_framework',
+    'rest_framework.authtoken',
+    'rest_auth',
+    'accounts',
+    'allauth',
+    'allauth.account',
+    'rest_auth.registration',
+    # 'django_rest_passwordreset'
 ]
+SITE_ID = 1
+AUTH_USER_MODEL = "accounts.User"
+
+
+REST_AUTH_REGISTER_SERIALIZERS = {
+    'REGISTER_SERIALIZER': 'accounts.serializers.UserSerializer',
+}
+REST_AUTH_SERIALIZERS = {
+    "PASSWORD_CHANGE_SERIALIZER": "accounts.serializers.CustomPasswordChnage",
+    'USER_DETAILS_SERIALIZER': 'accounts.serializers.CustomUserDetailsSerializer',
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -61,7 +88,7 @@ ROOT_URLCONF = 'hospital.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR,'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -83,9 +110,9 @@ WSGI_APPLICATION = 'hospital.wsgi.application'
 DATABASES = {
     'default': {
         "ENGINE": "django.db.backends.postgresql_psycopg2",
-        "NAME": env("DATABASE_NAME"),
-        "USER": env("USER_NAME"),
-        "PASSWORD": env("PASSWORD_NAME"),
+        "NAME": os.getenv("DATABASE_NAME"),
+        "USER": os.getenv("USER_NAME"),
+        "PASSWORD": os.getenv("PASSWORD_NAME"),
         "HOST": "localhost",
         "PORT": "5432",
     }
@@ -132,3 +159,14 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_EMAIL_VERIFICATION = "none"
+
+AUTHENTICATION_BACKENDS = (
+   "django.contrib.auth.backends.ModelBackend",
+   "allauth.account.auth_backends.AuthenticationBackend"
+)
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
