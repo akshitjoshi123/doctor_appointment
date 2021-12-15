@@ -69,8 +69,9 @@ REST_AUTH_REGISTER_SERIALIZERS = {
     'REGISTER_SERIALIZER': 'accounts.serializers.UserSerializer',
 }
 REST_AUTH_SERIALIZERS = {
-    "PASSWORD_CHANGE_SERIALIZER": "accounts.serializers.CustomPasswordChnage",
+    "PASSWORD_CHANGE_SERIALIZER": "accounts.serializers.CustomPasswordChange",
     'USER_DETAILS_SERIALIZER': 'accounts.serializers.CustomUserDetailsSerializer',
+    'PASSWORD_RESET_CONFIRM_SERIALIZER': 'accounts.serializers.CustomPasswordResetConfirm',
 }
 
 MIDDLEWARE = [

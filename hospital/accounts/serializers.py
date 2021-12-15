@@ -3,7 +3,7 @@ from rest_framework import serializers
 from rest_auth.registration.serializers import RegisterSerializer
 # from allauth.account.adapter import get_adapter
 from accounts.models import Specialist, User
-from rest_auth.serializers import PasswordChangeSerializer
+from rest_auth.serializers import PasswordChangeSerializer, PasswordResetConfirmSerializer
 
 
 class UserSerializer(RegisterSerializer):
@@ -47,7 +47,16 @@ class CustomUserDetailsSerializer(serializers.ModelSerializer):
         read_only_fields = ('pk', 'username', 'dob')
 
 
-class CustomPasswordChnage(PasswordChangeSerializer):
+class CustomPasswordChange(PasswordChangeSerializer):
+    new_password1 = serializers.CharField(
+        style={'input_type': 'password'}
+    )
+    new_password2 = serializers.CharField(
+        style={'input_type': 'password'}
+    )
+
+
+class CustomPasswordResetConfirm(PasswordResetConfirmSerializer):
     new_password1 = serializers.CharField(
         style={'input_type': 'password'}
     )
