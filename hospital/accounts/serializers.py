@@ -63,3 +63,6 @@ class CustomPasswordResetConfirm(PasswordResetConfirmSerializer):
     new_password2 = serializers.CharField(
         style={'input_type': 'password'}
     )
+
+
+

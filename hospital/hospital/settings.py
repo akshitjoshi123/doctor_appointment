@@ -56,10 +56,13 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'rest_auth',
     'accounts',
+    'doctors',
     'allauth',
     'allauth.account',
     'rest_auth.registration',
     # 'django_rest_passwordreset'
+    'drf_simple_invite',
+
 ]
 SITE_ID = 1
 AUTH_USER_MODEL = "accounts.User"
@@ -67,6 +70,7 @@ AUTH_USER_MODEL = "accounts.User"
 
 REST_AUTH_REGISTER_SERIALIZERS = {
     'REGISTER_SERIALIZER': 'accounts.serializers.UserSerializer',
+    # 'REGISTER_SERIALIZER': 'doctors.serializers.DoctorSerializer',
 }
 REST_AUTH_SERIALIZERS = {
     "PASSWORD_CHANGE_SERIALIZER": "accounts.serializers.CustomPasswordChange",
@@ -164,10 +168,17 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_UNIQUE_EMAIL = True
-ACCOUNT_EMAIL_VERIFICATION = "none"
+ACCOUNT_EMAIL_VERIFICATION = 'none'
+
 
 AUTHENTICATION_BACKENDS = (
    "django.contrib.auth.backends.ModelBackend",
    "allauth.account.auth_backends.AuthenticationBackend"
 )
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'taskmanagement@tntra.io'
+EMAIL_HOST_PASSWORD = 'botree123'
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
