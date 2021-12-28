@@ -1,0 +1,1 @@
+{{ name }} want appointment on {{date}} Open the hospital managament application and approve or cancel it.
