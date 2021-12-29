@@ -1,0 +1,1 @@
+The ReScheduled appointment request of {{patient_name}} on {{date}} is {{status}} by {{patient_name}}.

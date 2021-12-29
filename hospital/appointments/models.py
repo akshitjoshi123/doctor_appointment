@@ -7,8 +7,17 @@ from accounts.models import User
 status = (
     ("Confirm", "Confirm"),
     ("Cancel", "Cancel"),
-    ("ReShedule", "ReShedule"),
+    ("ReSchedule", "ReSchedule"),
     ("Pending", "Pending"),
+)
+
+action_status = (
+    ("Confirm", "Confirm"),
+    ("Cancel", "Cancel"),
+)
+
+reschedule_status = (
+    ("ReSchedule", "ReSchedule"),
 )
 
 
@@ -27,3 +36,15 @@ class Appointment(models.Model):
 
     def __str__(self):
         return str(self.patient)
+
+    def full_name(self):
+        f_name = ""
+        f_name += self.patient.first_name if self.patient.first_name else "" 
+        f_name += self.patient.last_name if self.patient.last_name else ""
+        return f_name
+
+    def full_name_doctor(self):
+        f_name = ""
+        f_name += self.doctor.first_name if self.doctor.first_name else "" 
+        f_name += self.doctor.last_name if self.doctor.last_name else ""
+        return f_name

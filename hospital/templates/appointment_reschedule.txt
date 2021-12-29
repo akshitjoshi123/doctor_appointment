@@ -1,0 +1,1 @@
+Your appointment with Dr.{{doctor_name}} is RESHEDULE on {{date}}. Open the hospital managament application and approve or cancel it.

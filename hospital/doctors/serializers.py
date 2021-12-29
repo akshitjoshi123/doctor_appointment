@@ -1,10 +1,12 @@
 from django.db import models
 from django.db.models import fields
+from django.db.models.enums import Choices
 from rest_framework import serializers
 from rest_auth.registration.serializers import RegisterSerializer
 # from allauth.account.adapter import get_adapter
 from accounts.models import Specialist, User
 from doctors.models import InviteDoctor
+from appointments.models import Appointment, action_status, reschedule_status
 
 
 class DoctorSerializer(RegisterSerializer):
@@ -44,3 +46,38 @@ class DoctorListserializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['first_name', 'last_name', 'contact', 'email', 'specialist']
+
+
+class UpdateDoctorProfile(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['username', 'first_name', 'last_name', 'contact', 'email', 'dob', 'specialist']
+
+
+class AppointmentListSerializer(serializers.ModelSerializer):
+    patient_name = serializers.CharField(source='full_name')
+
+    class Meta:
+        model = Appointment
+        fields = ['patient_name', 'date_time', 'status', 'description']
+
+
+class ConfirmRejectPatientAppointment(serializers.ModelSerializer):
+    patient_name = serializers.CharField(source='full_name', read_only=True)
+    status = serializers.ChoiceField(choices = action_status)
+
+    class Meta:
+        model = Appointment
+        fields = ['patient_name', 'date_time', 'status', 'description']
+        read_only_fields = ('date_time', 'description')
+
+
+class ReScheduleAppointment(serializers.ModelSerializer):
+    patient_name = serializers.CharField(source='full_name', read_only=True)
+    status = serializers.ChoiceField(choices = reschedule_status)
+
+    class Meta:
+        model = Appointment
+        fields = ['patient_name', 'date_time', 'status', 'description']
+        read_only_fields = ('description',)
+        

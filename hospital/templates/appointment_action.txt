@@ -1,0 +1,1 @@
+Your appointment on {{date}} is {{status}} by Dr.{{doctor_name}}
