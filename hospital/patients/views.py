@@ -1,12 +1,9 @@
-from django.shortcuts import render
 from rest_framework import generics
-from accounts.models import Specialist, User
-from appointments.models import Appointment
+from accounts.models import Specialist
 from patients.serializers import PatientsListserializer, ConfirmRejectReScheduleAppointment
 from rest_framework.permissions import IsAdminUser
-from django.core.mail import EmailMessage
-from django.template.loader import render_to_string
 from django.contrib.auth.mixins import LoginRequiredMixin
+from patients.services import PatientsManager, ReSheduleManager
 
 # Create your views here.
 
@@ -16,29 +13,28 @@ class IsSuperUser(IsAdminUser):
 
 
 class PatientsList(generics.ListAPIView):
+    """
+    View for display the details of patients.
+    """
     permission_classes = (IsSuperUser,)
     serializer_class = PatientsListserializer
 
     def get_queryset(self):
-        return User.objects.filter(specialist = None)
+        return PatientsManager.get_patients(self)
 
 
 class ReScheduledAppointmentList(LoginRequiredMixin, generics.RetrieveUpdateAPIView):
+    """
+    View for take action on rescheduling appointments.
+    """
     serializer_class = ConfirmRejectReScheduleAppointment
 
     def get_queryset(self):
-        return Appointment.objects.filter(patient=self.request.user)
+        return ReSheduleManager.get_patients(self)
 
     def put(self, request, *args, **kwargs):
         data = self.update(request, *args, **kwargs)
-        doctor_record = Appointment.objects.filter(id=self.kwargs['pk']).first()
-        email_send_to = doctor_record.doctor.email
-        context = {'patient_name': self.request.user,
-                'date': doctor_record.date_time,
-                'status': doctor_record.status}
-        body = render_to_string('patient_reschedule.txt', context)
-        email = EmailMessage('Appointment', body , to=[email_send_to])
-        email.send()
+        mail_sent = ReSheduleManager.set_reschedule(self)
         return data
 
 

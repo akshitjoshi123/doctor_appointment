@@ -11,15 +11,6 @@ status = (
     ("Pending", "Pending"),
 )
 
-action_status = (
-    ("Confirm", "Confirm"),
-    ("Cancel", "Cancel"),
-)
-
-reschedule_status = (
-    ("ReSchedule", "ReSchedule"),
-)
-
 
 class Appointment(models.Model):
     """

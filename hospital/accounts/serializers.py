@@ -7,7 +7,9 @@ from rest_auth.serializers import PasswordChangeSerializer, PasswordResetConfirm
 
 
 class UserSerializer(RegisterSerializer):
-
+    """
+    Serializer for custom Registration for user.
+    """
     first_name = serializers.CharField()
     last_name = serializers.CharField()
     contact = serializers.CharField()
@@ -32,7 +34,9 @@ class UserSerializer(RegisterSerializer):
 
 
 class CustomUserDetailsSerializer(serializers.ModelSerializer):
-
+    """
+    Serializer for Show the details of user.
+    """
     class Meta:
         model = User
         fields = (
@@ -48,6 +52,9 @@ class CustomUserDetailsSerializer(serializers.ModelSerializer):
 
 
 class CustomPasswordChange(PasswordChangeSerializer):
+    """
+    Serializer for password change
+    """
     new_password1 = serializers.CharField(
         style={'input_type': 'password'}
     )
@@ -57,6 +64,9 @@ class CustomPasswordChange(PasswordChangeSerializer):
 
 
 class CustomPasswordResetConfirm(PasswordResetConfirmSerializer):
+    """
+    Serializer for password change confirm
+    """
     new_password1 = serializers.CharField(
         style={'input_type': 'password'}
     )

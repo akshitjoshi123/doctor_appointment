@@ -1,28 +1,29 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import render
-from appointments.models import Appointment
 from rest_auth.registration.views import RegisterView
-from rest_framework import generics, serializers
-from rest_framework import permissions
-from rest_framework.views import APIView
+from rest_framework import generics
 from accounts.models import Specialist, User
-from doctors.serializers import InviteDoctorSerializer, DoctorSerializer, DoctorListserializer, AppointmentListSerializer, ConfirmRejectPatientAppointment, UpdateDoctorProfile, ReScheduleAppointment
+from doctors.serializers import InviteDoctorSerializer, DoctorSerializer, DoctorListserializer, AppointmentListSerializer, ConfirmRejectPatientAppointment, UpdateDoctorProfile, ReScheduleAppointment, MyPatientProfileSerializer
 from rest_framework.permissions import IsAdminUser
 from doctors.models import InviteDoctor
-from django.core.mail import EmailMessage
-from django.template.loader import render_to_string
-
+from doctors.services import InviteDoctorManager, DoctorManager, ActionAppointment, RescheduleAppointment, MyPatientProfile
 # Create your views here.
 
 class IsSuperUser(IsAdminUser):
     def has_permission(self, request, view):
         return bool(request.user and request.user.is_superuser)
 
+
 class DoctorRegistration(RegisterView):
-    # permission_classes = (IsSuperUser,) 
+    """
+    View for doctor registration.
+    """
     serializer_class = DoctorSerializer
 
+
 class InviteDoctorView(generics.CreateAPIView):
+    """
+    View for Invite Doctor for using system.
+    """
     permission_classes = (IsSuperUser,)
     queryset = InviteDoctor.objects.all()
     serializer_class = InviteDoctorSerializer
@@ -32,65 +33,74 @@ class InviteDoctorView(generics.CreateAPIView):
 
     def perform_create(self, serializer):
         data = serializer.save()
-        email_send_to = data.invite_email
-        email = EmailMessage('Invitation of Hospital Appointment', 'Registration :- http://127.0.0.1:8000/doctors/register_doctor/', to=[email_send_to])
-        email.send()
-    
+        invite_doctor = InviteDoctorManager.set_invite_doctor(self, data)
+
 
 class DoctorList(generics.ListAPIView):
+    """
+    This View is use to list the doctor details.
+    """
     serializer_class = DoctorListserializer
 
     def get_queryset(self):
-        return User.objects.exclude(specialist = None)
+        return DoctorManager.get_doctor_list(self)
 
 
 class UpdateDoctorProfileView(LoginRequiredMixin, generics.RetrieveUpdateAPIView):
+    """
+    View for update the profile of doctor by its self.
+    """
     serializer_class = UpdateDoctorProfile
 
     def get_queryset(self):
-        return User.objects.filter(username=self.request.user)
+        return DoctorManager.set_update_doctor_profile(self)
 
 
 class PatientsAppointmentList(LoginRequiredMixin, generics.ListAPIView):
+    """
+    View for list out the appointment for any particular doctor. 
+    """
     serializer_class = AppointmentListSerializer
 
     def get_queryset(self):
-        return Appointment.objects.filter(doctor=self.request.user)
+        return ActionAppointment.get_appointment(self)
 
 
 class ActionAppointmentList(LoginRequiredMixin, generics.RetrieveUpdateAPIView):
+    """
+    View for take action on the appointment(Doctor can Confirm or cancel the appointment).
+    """
     serializer_class = ConfirmRejectPatientAppointment
 
     def get_queryset(self):
-        return Appointment.objects.filter(doctor=self.request.user)
+        return ActionAppointment.get_appointment(self)
 
     def put(self, request, *args, **kwargs):
         data = self.update(request, *args, **kwargs)
-        patient_record = Appointment.objects.filter(id=self.kwargs['pk']).first()
-        email_send_to = patient_record.patient.email
-        context = {'doctor_name': self.request.user,
-                'date': patient_record.date_time,
-                'status': patient_record.status}
-        body = render_to_string('appointment_action.txt', context)
-        email = EmailMessage('Appointment', body , to=[email_send_to])
-        email.send()
+        action = ActionAppointment.set_action(self)
         return data
-        # return self.update(request, *args, **kwargs)
 
 
 class ReScheduleAppointmentList(LoginRequiredMixin, generics.RetrieveUpdateAPIView):
+    """
+    View for rescheduling the appointments.
+    """
     serializer_class = ReScheduleAppointment
 
     def get_queryset(self):
-        return Appointment.objects.filter(doctor=self.request.user)
+        return ActionAppointment.get_appointment(self)
 
     def put(self, request, *args, **kwargs):
         data = self.update(request, *args, **kwargs)
-        patient_record = Appointment.objects.filter(id=self.kwargs['pk']).first()
-        email_send_to = patient_record.patient.email
-        context = {'doctor_name': self.request.user,
-                'date': patient_record.date_time}
-        body = render_to_string('appointment_reschedule.txt', context)
-        email = EmailMessage('Appointment', body , to=[email_send_to])
-        email.send()
+        reschedule = RescheduleAppointment.set_reschedule(self) 
         return data
+
+
+class MyPatientProfileView(LoginRequiredMixin, generics.ListAPIView):
+    """
+    View for show the patients profile by its Doctor
+    """
+    serializer_class = MyPatientProfileSerializer
+
+    def get_queryset(self):
+        return MyPatientProfile.get_profile(self)

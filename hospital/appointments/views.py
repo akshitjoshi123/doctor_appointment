@@ -1,23 +1,43 @@
 from django.shortcuts import render
 from rest_framework import generics
-from appointments.serializers import AppointmentSerializer
+from appointments.serializers import AppointmentSerializer, DateWiseAppointment
 from appointments.models import Appointment
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.mail import EmailMessage
-from django.template.loader import render_to_string
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from appointments.services import set_appointment_create, get_date_wise_list
+import json
+
 # Create your views here.
 
 class AppointmentCreateApi(LoginRequiredMixin, generics.CreateAPIView):
+    """
+    View for booking the appointments.
+    """
     serializer_class = AppointmentSerializer
     queryset = Appointment.objects.all() 
     def post(self, request, *args, **kwargs):
         return self.create(request, *args, **kwargs)
 
     def perform_create(self, serializer):
-        data = serializer.save(patient=self.request.user)
-        email_send_to = data.doctor.email
-        context = {'name': data.patient.first_name,
-                'date': data.date_time}
-        body = render_to_string('appointment_book.txt', context)
-        email = EmailMessage('New Appointment', body , to=[email_send_to])
-        email.send()
+        get_time = serializer.validated_data['date_time']
+        get_doctor = serializer.validated_data['doctor']
+        create_appointment = set_appointment_create(self, get_time, get_doctor, serializer) 
+
+
+class DateWiseListView(LoginRequiredMixin, APIView):
+    """
+    View for list out appointment time for any particular date. 
+    """
+    serializer_class = DateWiseAppointment
+    def post(self, request):
+        data = []
+        serializers = DateWiseAppointment(data=request.data)
+        if serializers.is_valid(raise_exception=True):
+            s_date = serializers.validated_data['selected_date']
+            d_name = serializers.validated_data['doctor_name']
+            data = get_date_wise_list(self, s_date, d_name, data)
+        return Response(data) 
+
+                
