@@ -6,6 +6,7 @@ from doctors.serializers import InviteDoctorSerializer, DoctorSerializer, Doctor
 from rest_framework.permissions import IsAdminUser
 from doctors.models import InviteDoctor
 from doctors.services import InviteDoctorManager, DoctorManager, ActionAppointment, RescheduleAppointment, MyPatientProfile
+import logging
 # Create your views here.
 
 class IsSuperUser(IsAdminUser):
@@ -32,8 +33,11 @@ class InviteDoctorView(generics.CreateAPIView):
         return self.create(request, *args, **kwargs)
 
     def perform_create(self, serializer):
-        data = serializer.save()
-        invite_doctor = InviteDoctorManager.set_invite_doctor(self, data)
+        try:
+            data = serializer.save()
+            invite_doctor = InviteDoctorManager.set_invite_doctor(self, data)
+        except Exception as e:
+            logging.error(str(e))
 
 
 class DoctorList(generics.ListAPIView):
@@ -76,9 +80,13 @@ class ActionAppointmentList(LoginRequiredMixin, generics.RetrieveUpdateAPIView):
         return ActionAppointment.get_appointment(self)
 
     def put(self, request, *args, **kwargs):
-        data = self.update(request, *args, **kwargs)
-        action = ActionAppointment.set_action(self)
-        return data
+        try:
+            data = self.update(request, *args, **kwargs)
+            action = ActionAppointment.set_action(self)
+            return data
+        except Exception as e:
+            logging.error(str(e))
+            return data
 
 
 class ReScheduleAppointmentList(LoginRequiredMixin, generics.RetrieveUpdateAPIView):
@@ -91,9 +99,13 @@ class ReScheduleAppointmentList(LoginRequiredMixin, generics.RetrieveUpdateAPIVi
         return ActionAppointment.get_appointment(self)
 
     def put(self, request, *args, **kwargs):
-        data = self.update(request, *args, **kwargs)
-        reschedule = RescheduleAppointment.set_reschedule(self) 
-        return data
+        try:
+            data = self.update(request, *args, **kwargs)
+            reschedule = RescheduleAppointment.set_reschedule(self) 
+            return data
+        except Exception as e:
+            logging.error(str(e))
+            return data
 
 
 class MyPatientProfileView(LoginRequiredMixin, generics.ListAPIView):

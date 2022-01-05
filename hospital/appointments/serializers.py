@@ -5,6 +5,9 @@ from appointments.models import Appointment
 from accounts.models import User
 from appointments.constants import FUTURE_DATE_VALIDATION, APPOINTMENTS_8_TO_22
 
+FUTURE_DATE_VALIDATION = FUTURE_DATE_VALIDATION
+APPOINTMENTS_8_TO_22 = APPOINTMENTS_8_TO_22
+
 
 FUTURE_DATE_VALIDATION = FUTURE_DATE_VALIDATION
 class AppointmentSerializer(serializers.ModelSerializer):

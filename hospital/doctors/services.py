@@ -4,6 +4,10 @@ from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
 from doctors.constants import INVITE_DOCTOR_EMAIL_SUBJECT, INVITE_DOCTOR_EMAIL_BODY, ACTION_MAIL_SUBJECT
 
+INVITE_DOCTOR_EMAIL_SUBJECT = INVITE_DOCTOR_EMAIL_SUBJECT
+INVITE_DOCTOR_EMAIL_BODY = INVITE_DOCTOR_EMAIL_BODY
+ACTION_MAIL_SUBJECT = ACTION_MAIL_SUBJECT
+
 class InviteDoctorManager():
     def set_invite_doctor(self, data, *args, **kwargs):
         email_send_to = data.invite_email

@@ -10,6 +10,8 @@ from rest_framework import serializers, status
 from datetime import datetime, time, timedelta
 from appointments.constants import APPOINTMENT_VALIDATION
 
+APPOINTMENT_VALIDATION = APPOINTMENT_VALIDATION
+
 
 def set_appointment_create(self, get_time, get_doctor, serializer, *args, **kwargs):
     appointment_time = Appointment.objects.filter(doctor=get_doctor)

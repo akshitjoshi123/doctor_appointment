@@ -4,6 +4,7 @@ from patients.serializers import PatientsListserializer, ConfirmRejectReSchedule
 from rest_framework.permissions import IsAdminUser
 from django.contrib.auth.mixins import LoginRequiredMixin
 from patients.services import PatientsManager, ReSheduleManager
+import logging
 
 # Create your views here.
 
@@ -33,8 +34,10 @@ class ReScheduledAppointmentList(LoginRequiredMixin, generics.RetrieveUpdateAPIV
         return ReSheduleManager.get_patients(self)
 
     def put(self, request, *args, **kwargs):
-        data = self.update(request, *args, **kwargs)
-        mail_sent = ReSheduleManager.set_reschedule(self)
-        return data
-
-
+        try:
+            data = self.update(request, *args, **kwargs)
+            mail_sent = ReSheduleManager.set_reschedule(self)
+            return data
+        except Exception as e:
+            logging.error(str(e))
+            return data

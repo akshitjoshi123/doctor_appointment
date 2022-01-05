@@ -7,7 +7,7 @@ from django.core.mail import EmailMessage
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from appointments.services import set_appointment_create, get_date_wise_list
-import json
+import logging
 
 # Create your views here.
 
@@ -23,7 +23,10 @@ class AppointmentCreateApi(LoginRequiredMixin, generics.CreateAPIView):
     def perform_create(self, serializer):
         get_time = serializer.validated_data['date_time']
         get_doctor = serializer.validated_data['doctor']
-        create_appointment = set_appointment_create(self, get_time, get_doctor, serializer) 
+        try:
+            create_appointment = set_appointment_create(self, get_time, get_doctor, serializer)
+        except Exception as e:
+            logging.error(str(e))
 
 
 class DateWiseListView(LoginRequiredMixin, APIView):
@@ -33,11 +36,15 @@ class DateWiseListView(LoginRequiredMixin, APIView):
     serializer_class = DateWiseAppointment
     def post(self, request):
         data = []
-        serializers = DateWiseAppointment(data=request.data)
-        if serializers.is_valid(raise_exception=True):
-            s_date = serializers.validated_data['selected_date']
-            d_name = serializers.validated_data['doctor_name']
-            data = get_date_wise_list(self, s_date, d_name, data)
-        return Response(data) 
+        try:
+            serializers = DateWiseAppointment(data=request.data)
+            if serializers.is_valid(raise_exception=True):
+                s_date = serializers.validated_data['selected_date']
+                d_name = serializers.validated_data['doctor_name']
+                data = get_date_wise_list(self, s_date, d_name, data)
+            return Response(data)
+        except Exception as e:
+            logging.error(str(e))
+            return Response(data)
 
                 

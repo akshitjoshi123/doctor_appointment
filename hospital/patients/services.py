@@ -5,6 +5,8 @@ from django.template.loader import render_to_string
 from doctors.constants import ACTION_MAIL_SUBJECT
 
 
+ACTION_MAIL_SUBJECT = ACTION_MAIL_SUBJECT
+
 class PatientsManager():
     def get_patients(self, *args, **kwargs):
         return User.objects.filter(specialist = None)
