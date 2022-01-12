@@ -25,6 +25,7 @@ class AppointmentCreateApi(LoginRequiredMixin, generics.CreateAPIView):
         get_doctor = serializer.validated_data['doctor']
         try:
             create_appointment = set_appointment_create(self, get_time, get_doctor, serializer)
+            # change_appointment_status.delay()
         except Exception as e:
             logging.error(str(e))
 

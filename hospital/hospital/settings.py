@@ -15,6 +15,7 @@ from pathlib import Path
 import os
 
 from dotenv import load_dotenv
+from celery.schedules import crontab
 
 # from environ import Env
 
@@ -150,7 +151,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Kolkata'
 
 USE_I18N = True
 
@@ -186,9 +187,19 @@ EMAIL_HOST_PASSWORD = 'botree123'
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 
-CELERY_BROKER_URL = 'redis://localhost:6379/'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379'
+# CELERY_BROKER_URL = 'amqp://localhost'
+CELERY_BROKER_URL = 'rpc://localhost'
+# CELERY_BROKER_URL = 'redis://localhost:6379/'
+# CELERY_RESULT_BACKEND = 'amqp://localhost'
+CELERY_RESULT_BACKEND = 'rpc://localhost'
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
-CELERY_TIMEZONE = 'Africa/Nairobi'
+CELERY_TIMEZONE = 'Asia/Kolkata'
+
+CELERYBEAT_SCHEDULE = {
+    'context': {
+       'task': 'appointments.tasks.change_appointment_status',
+       'schedule': crontab(hour=23, minute=59) 
+   },
+}

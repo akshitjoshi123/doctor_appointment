@@ -16,7 +16,8 @@ app = Celery('hospital')
 app.config_from_object('django.conf:settings')
 
 # Load task modules from all registered Django apps.
-app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
+# app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
+app.autodiscover_tasks()
 
 
 @app.task(bind=True)

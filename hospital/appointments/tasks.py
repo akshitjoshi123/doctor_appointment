@@ -3,31 +3,18 @@
 # from demoapp.models import Widget
 
 from celery import shared_task
+from datetime import datetime
+from appointments.models import Appointment
+from datetime import date
+from django.db.models import Q
 
+# @task(name='change_appointment_status')
+# def change_appointment_status():
+#     pass
 
 @shared_task
-def add(x, y):
-    print("heettttt")
-    return "ggg"
-
-
-# @shared_task
-# def mul(x, y):
-#     return x * y
-
-
-# @shared_task
-# def xsum(numbers):
-#     return sum(numbers)
-
-
-# @shared_task
-# def count_widgets():
-#     return Widget.objects.count()
-
-
-# @shared_task
-# def rename_widget(widget_id, name):
-#     w = Widget.objects.get(id=widget_id)
-#     w.name = name
-#     w.save()
+def change_appointment_status():
+    today = date.today()
+    # appoint = Appointment.objects.filter(date_time__date=today, status='ReSchedule').update(status='Cancel')
+    appoint = Appointment.objects.filter(date_time__date=today).exclude(status='Confirm').update(status='Cancel')
+    return appoint
